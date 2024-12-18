@@ -3,56 +3,41 @@
 <head>
     <title>Path to Philosophy</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
         #path {
-            margin-top: 20px;
-        }
-        .article {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
+            margin: 20px;
+            line-height: 1.6;
         }
         .arrow {
-            color: #666;
             margin: 0 10px;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <h1>Path to Philosophy</h1>
-    <div>
-        <input type="text" id="startArticle" placeholder="Enter Wikipedia article title">
-        <button onclick="findPath()">Find Path</button>
-    </div>
+    <input type="text" id="startArticle" placeholder="Enter starting article" value="Cat">
+    <button onclick="findPath()">Find Path</button>
     <div id="path"></div>
 
     <script>
-        async function findPath() {
-            const startArticle = document.getElementById('startArticle').value || 'Cat';
-            const pathDiv = document.getElementById('path');
-            pathDiv.innerHTML = 'Loading...';
-            
-            try {
-                const response = await fetch(`/find_path?start=${encodeURIComponent(startArticle)}`);
-                const data = await response.json();
-                
-                pathDiv.innerHTML = data.path.map((article, index) => `
-                    <span class="article">
-                        <a href="https://en.wikipedia.org/wiki/${article}" target="_blank">
-                            ${article.replace(/_/g, ' ')}
-                        </a>
-                    </span>
-                    ${index < data.path.length - 1 ? '<span class="arrow">→</span>' : ''}
-                `).join('');
-            } catch (error) {
-                pathDiv.innerHTML = 'Error finding path';
-            }
+        function findPath() {
+            const start = document.getElementById('startArticle').value;
+            fetch(`/find_path?start=${encodeURIComponent(start)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const pathDiv = document.getElementById('path');
+                    pathDiv.innerHTML = data.path.map((article, i) => {
+                        const formattedArticle = article.replace(/_/g, ' ');
+                        return `
+                            <span>
+                                <a href="https://en.wikipedia.org/wiki/${article}" target="_blank">
+                                    ${formattedArticle}
+                                </a>
+                                ${i < data.path.length - 1 ? '<span class="arrow">→</span>' : ''}
+                            </span>
+                        `;
+                    }).join('');
+                });
         }
     </script>
 </body>
