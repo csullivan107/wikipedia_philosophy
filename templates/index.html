@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Path to Philosophy</title>
+    <style>
+        #path {
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .arrow {
+            margin: 0 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Path to Philosophy</h1>
+    <input type="text" id="startArticle" placeholder="Enter starting article" value="Cat">
+    <button onclick="findPath()">Find Path</button>
+    <div id="path"></div>
+
+    <script>
+        function findPath() {
+            const start = document.getElementById('startArticle').value;
+            fetch(`/find_path?start=${encodeURIComponent(start)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const pathDiv = document.getElementById('path');
+                    pathDiv.innerHTML = data.path.map((article, i) => {
+                        const formattedArticle = article.replace(/_/g, ' ');
+                        return `
+                            <span>
+                                <a href="https://en.wikipedia.org/wiki/${article}" target="_blank">
+                                    ${formattedArticle}
+                                </a>
+                                ${i < data.path.length - 1 ? '<span class="arrow">→</span>' : ''}
+                            </span>
+                        `;
+                    }).join('');
+                });
+        }
+    </script>
+</body>
+</html> 
